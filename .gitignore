@@ -208,3 +208,6 @@ __marimo__/
 
 # Project data (raw datasets are not committed)
 data/
+
+# macOS
+.DS_Store
