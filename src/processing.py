@@ -1,5 +1,9 @@
+import os
+
 import pandas as pd
 import phik
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
 
 class DataProcessor:
@@ -38,6 +42,18 @@ class DataProcessor:
             'city_name'
         ]
         self.df = df[cols].copy()
+        return self.df
+
+    def load_data_from_db(self, query):
+        load_dotenv()
+        db_user = os.getenv('DB_USER')
+        db_pwd = os.getenv('DB_PWD')
+        db_host = os.getenv('DB_HOST')
+        db_port = os.getenv('DB_PORT')
+        db_name = os.getenv('DB_NAME')
+
+        engine = create_engine(f'postgresql+psycopg2://{db_user}:{db_pwd}@{db_host}:{db_port}/{db_name}')
+        self.df = pd.read_sql_query(query, con=engine)
         return self.df
 
     def load_currency(self):
