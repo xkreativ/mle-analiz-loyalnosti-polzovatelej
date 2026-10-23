@@ -14,6 +14,7 @@ class DataProcessor:
         self.df = None
         self.df_currency = None
         self.user_profile = None
+        self.duplicates_count = 0
 
     def load_data(self):
         df_orders = pd.read_csv(self.orders_path)
@@ -61,7 +62,11 @@ class DataProcessor:
         return self.df_currency
 
     def preprocess(self):
-        df = self.df.merge(self.df_currency, left_on='order_dt', right_on='data', how='left')
+        key = ['user_id', 'order_ts', 'device_type_canonical', 'service_name', 'event_id', 'revenue']
+        self.duplicates_count = self.df.duplicated(subset=key).sum()
+        df = self.df.drop_duplicates(subset=key)
+
+        df = df.merge(self.df_currency, left_on='order_dt', right_on='data', how='left')
 
         df['revenue_rub'] = df['revenue']
         mask_kzt = df['currency_code'] == 'kzt'
